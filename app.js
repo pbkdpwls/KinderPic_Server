@@ -399,6 +399,32 @@ mongoClient.connect(url, (err, db) => {
             });
 
         });
+
+        // 그룹 정보 가져오기
+        app.post('/group', (req, res) => {
+            collectiong.find( {group_name: req.body.groupname }).toArray(function (err, result) {
+
+                if(result != null){
+                    var group_id = result[0].group_id
+                    var group_date = result[0].group_date
+                    var group_place = result[0].group_place
+                    var group_schoolinfo = result[0].group_schoolinfo
+
+                    const objToSendGroup = {
+                        group_id,
+                        group_date,
+                        group_place,
+                        group_schoolinfo
+                    }
+                    res.status(200).send(JSON.stringify(objToSendGroup));
+
+                }else{
+                    res.status(400).send("그룹 정보 가져오기 실패")
+                }
+
+            });
+
+        })
 }
 });
 
