@@ -327,6 +327,44 @@ mongoClient.connect(url, (err, db) => {
                 }
             });
         });
+
+        // 그룹 삭제하기
+        app.post('/delete_group', (req, res) => {
+            const q_group = {
+                group_email: req.body.email,
+                group_name: req.body.groupname
+            }
+
+            var query = {};
+            const q_email = { email: req.body.email }
+
+            collection.findOne(q_email, (err, result) => {
+                var myemail = 'group_email_' + result.name;
+                query[myemail]=req.body.email;
+            })
+
+            // 그룹장이 그룹 삭제
+            collectiong.findOne(q_group, (err, result) => {
+                if (result != null) {
+                    collectiong.deleteOne(result, (err, obj) => {
+                        res.status(300).send("그룹 삭제가 완료되었습니다.");
+                    });
+                }
+                else {
+                    // 그룹 멤버가 그룹 삭제
+                    collectiong.findOne({$and: [{ group_name: req.body.groupname }, query]}, (err, result) => {
+                        if(result != null){
+                            collectiong.updateOne({group_name: req.body.groupname}, { $unset:  query })
+                            res.status(200).send("그룹 삭제 완료");
+                        }
+                        else{
+                            res.status(400).send("그룹 삭제에 오류가 발생했습니다.");
+                        }
+                    });
+                }
+            });
+
+        });
 }
 });
 
