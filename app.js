@@ -377,6 +377,28 @@ mongoClient.connect(url, (err, db) => {
                 }
             });
         });
+
+        // 검색한 그룹 추가하기
+        app.post('/add_search_group', (req, res) => {
+            // 이메일 field 생성
+            var myemail = ''
+            const q_email = { email: req.body.email }
+            collection.findOne(q_email, (err, result) => {
+                myemail = 'group_email_' + result.name;
+            })
+            const q_groupid = { group_id: req.body.groupid }
+
+            // id에 newgroup 추가
+            collectiong.findOne(q_groupid, (err, result) => {
+                if (result = ! null) {
+                    collectiong.updateOne({group_id: req.body.groupid}, {$set: {[myemail]: req.body.email}}, false, true)
+                    res.status(200).send("그룹에 유저 추가 성공");
+                } else {
+                    res.status(400).send("그룹에 유저 추가 실패");
+                }
+            });
+
+        });
 }
 });
 
