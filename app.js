@@ -275,7 +275,32 @@ mongoClient.connect(url, (err, db) => {
 
         })
 
+        // group id 생성
+       app.get('/groupid', (req, res) => {
+            function randomString() {
+                var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+                var string_length = 10;
+                var randomstring = '';
+                for (var i = 0; i < string_length; i++) {
+                    var rnum = Math.floor(Math.random() * chars.length);
+                    randomstring += chars.substring(rnum, rnum + 1);
+                }
 
+                res.status(200).send(randomstring);
+
+                // group id 중복 확인
+                collectiong.findOne(group_id, (err, result) => {
+                    if(result != null) {
+                        randomString();
+                    }
+                    else {
+                        debug("중복 확인" + randomString)
+                        res.status(200).send(randomstring);
+                    }
+                });
+            }
+            randomString();
+       })
 }
 });
 
