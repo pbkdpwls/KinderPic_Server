@@ -71,6 +71,19 @@ function searchByImage(image, cb) {
     });
 }
 
+mongoClient.connect(url, (err, db) => {
+    if (err) {
+        console.log(err);
+        console.log('Error while connecting mongo client');
+    }
+    else {
+        const myDb = db.db('myDb');
+        const collection = myDb.collection('myTable2');
+        const collectiong = myDb.collection('myTable3');
+        const collectionImg = myDb.collection('myimages');
+}
+});
+
 app.listen(3000, () => {
     console.log("listening on port 3000....");
 });
