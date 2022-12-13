@@ -82,6 +82,9 @@ mongoClient.connect(url, (err, db) => {
         const collectiong = myDb.collection('myTable3');
         const collectionImg = myDb.collection('myimages');
 
+        // 사용자 사진 목록
+        var uploadfiles = upload.array("photo");
+
         // 이메일 인증
         app.post('/check', (req, res)=> {
             const sendEmail  = req.body.email;
@@ -131,7 +134,6 @@ mongoClient.connect(url, (err, db) => {
 
         });
 
-
         // 회원가입
         app.post('/signup', (req, res) => {
 
@@ -155,7 +157,6 @@ mongoClient.connect(url, (err, db) => {
             });
 
         });
-
 
         // 로그인
         app.post('/login', (req, res) =>{
@@ -184,6 +185,33 @@ mongoClient.connect(url, (err, db) => {
             });
         })
 
+        // 사용자 사진 목록 등록
+        app.post('/groupimage', (req, res)=>{
+            console.log(req.body);
+
+            uploadfiles(req, res, err => {
+                console.log(req.files);
+                console.log("파일 업로드 완료");
+                console.log(req.body);
+
+                const query = {email: req.body.email};
+                const imagesData = {
+                    email : req.body.email,
+                    files : req.files
+                }
+                collectionImg.findOne(query, (err, result) => {
+                    if(result == null) {
+                        collectionImg.insertOne(imagesData, (err, result) => {
+                            res.status(200).send();
+                        });
+                    } else {
+                        res.status(400).send();
+                    }
+                });
+                res.end();
+            });
+
+        });
 
 }
 });
