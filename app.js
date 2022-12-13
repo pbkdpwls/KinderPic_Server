@@ -84,6 +84,8 @@ mongoClient.connect(url, (err, db) => {
 
         // 사용자 사진 목록
         var uploadfiles = upload.array("photo");
+        // 그룹 사진 목록
+        var groupImage = upload.array("Image");
 
         // 이메일 인증
         app.post('/check', (req, res)=> {
@@ -213,6 +215,43 @@ mongoClient.connect(url, (err, db) => {
 
         });
 
+        // 그룹 이미지 받기 - 감정인식 완료된 사진그룹 받아서 인물분류
+        app.post('/myimage', function(req, res){
+            console.log(req.body);
+            groupImage(req, res, err => {
+                console.log(req.files);
+                console.log("이미지 업로드");
+
+                const query = {email: req.body.email};
+                var paths = req.files.map(file => file.path);
+                var pathsArray = String(paths).split(",");
+                var originalnameArray = req.files.map(file => file.originalname);
+
+                for(var i in pathsArray) {
+                    var param = {
+                    'Bucket':'kindersbucket',
+                    'Key': 'image/' + originalnameArray[i],
+                    'ACL':'public-read',
+                    'Body':fs.createReadStream(pathsArray[i]),
+                    'ContentType':'image/png'
+                    }
+
+                    s3.upload (param, function (err, data) {
+                        if (err) {
+                        console.log("S3 Upload Error", err);
+                        } if (data) {
+                        console.log("S3 Upload Success", data.Location);
+                        }
+                    });
+                }
+
+                if (!req.files)
+                    return res.status(400).send('No files were uploaded.');
+
+                // 인물 분류
+                searchByImage(req.files, function(images){ })
+            });
+        });
 }
 });
 
