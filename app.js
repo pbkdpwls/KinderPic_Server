@@ -252,6 +252,30 @@ mongoClient.connect(url, (err, db) => {
                 searchByImage(req.files, function(images){ })
             });
         });
+
+        // 탈퇴하기
+        app.post('/leave', (req, res) => {
+            const query = {
+                email: req.body.email,
+                password: req.body.password
+            }
+
+            collection.findOne(query, (err, result) => {
+                if(result != null) {
+                    collection.deleteOne(result, (err, obj) => {
+                        res.status(200).send();
+                        console.log("탈퇴 완료.");
+                    });
+                }
+                else {
+                    res.status(404).send();
+                    console.log("탈퇴하려는 회원의 정보가 없습니다.");
+                }
+            });
+
+        })
+
+
 }
 });
 
