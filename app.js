@@ -81,6 +81,55 @@ mongoClient.connect(url, (err, db) => {
         const collection = myDb.collection('myTable2');
         const collectiong = myDb.collection('myTable3');
         const collectionImg = myDb.collection('myimages');
+
+        // 이메일 인증
+        app.post('/check', (req, res)=> {
+            const sendEmail  = req.body.email;
+
+            const smtpTransport = nodemailer.createTransport({
+                service: "gmail",
+                auth: {
+                    user: email,
+                    pass: password
+                },
+                tls: {
+                    rejectUnauthorized: false
+                }
+            });
+
+            const Checking = generateRandom(111111,999999)
+
+            console.log(req.body.email);
+
+            const mailOptions = {
+                from: "Triple, 여행을 편안하게",
+                to: sendEmail,
+                subject: "[Triple] 인증 관련 이메일 입니다",
+                text: "오른쪽 숫자 6자리를 입력해주세요 : " + Checking
+            };
+
+            const mailToCheking = {
+                email : req.body.email,
+                Checking : Checking
+            }
+
+            console.log(Checking);
+
+            smtpTransport.sendMail(mailOptions, (error) => {
+                if (error) {
+                    console.log("에러입니다.");
+                    console.log(error);
+                }
+                else {
+                    /* 클라이언트에게 인증 번호를 보내서 사용자가 맞게 입력하는지 확인! */
+                    console.log("정상 실행");
+                    res.status(200).send(mailToCheking);
+                }
+                smtpTransport.close();
+            });
+
+
+        });
 }
 });
 
