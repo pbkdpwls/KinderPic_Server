@@ -425,6 +425,31 @@ mongoClient.connect(url, (err, db) => {
             });
 
         })
+
+        // 홈 화면 조회하기
+        app.post('/home', (req, res) => {
+            var arr_name = []
+            var query = {};
+            const q_email = { email: req.body.email }
+            collection.findOne(q_email, (err, result) => {
+                var myemail = 'group_email_' + result.name;
+                query[myemail]=req.body.email;
+            })
+
+            collectiong.find({$or: [{ group_email: req.body.email }, query]}, { projection: { group_name: 1 } }).toArray(function (err, result) {
+                if(result != null){
+                    collectiong.find({$or: [{ group_email: req.body.email }, query]}, { projection: { group_name: 1 } }).toArray(function (err, result) {
+                        for (var i = 0; i < result.length; i++) {
+                            arr_name[i] = result[i].group_name
+                        }
+                        res.status(200).send(arr_name)
+                    });
+                }
+                else{
+                    res.status(400).send("홈 화면 조회하기 에러")
+                }
+            });
+    })
 }
 });
 
