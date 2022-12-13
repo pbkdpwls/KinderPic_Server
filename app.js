@@ -44,3 +44,29 @@ var generateRandom = function (min, max) {
 }
 
 var rekognition = new AWS.Rekognition();
+
+// 인물분류
+function searchByImage(image, cb) {
+    var params = {
+        CollectionId: "kinders",
+        Image: {
+            Bytes: image.data.buffer
+        }
+    };
+
+    rekognition.searchFacesByImage(params, function(err, data) {
+        if(err) {
+            console.log(err, err.stack);
+
+            cb({})
+        }
+        else {
+            console.log(data);
+            const imageMatches = data.FaceMatches.filter(function(match){ return match.Face.ExternalImageId !== undefined;})
+                .map(function(image){return image.Face.ExternalImageId;})
+                .map(function(s3ObjectKey){return "https://kindersbucket.s3.ap-northeast-2.amazonaws.com/"+s3ObjectKey;})
+
+            cb(imageMatches);
+        }
+    });
+}
