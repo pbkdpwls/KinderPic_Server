@@ -130,6 +130,32 @@ mongoClient.connect(url, (err, db) => {
 
 
         });
+
+
+        //회원가입
+        app.post('/signup', (req, res) => {
+
+            const newUser = {
+                email : req.body.email,
+                name : req.body.name,
+                password : req.body.password,
+                job : req.body.job,
+            };
+
+            const query = {email: newUser.email};
+
+            collection.findOne(query, (err, result) => {
+                if(result == null) {
+                    collection.insertOne(newUser, (err, result) => {
+                        res.status(200).send();
+                    });
+                } else {
+                    res.status(404).send();
+                }
+            });
+
+        });
+
 }
 });
 
