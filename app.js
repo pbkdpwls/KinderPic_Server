@@ -132,7 +132,7 @@ mongoClient.connect(url, (err, db) => {
         });
 
 
-        //회원가입
+        // 회원가입
         app.post('/signup', (req, res) => {
 
             const newUser = {
@@ -155,6 +155,35 @@ mongoClient.connect(url, (err, db) => {
             });
 
         });
+
+
+        // 로그인
+        app.post('/login', (req, res) =>{
+
+            console.log(req.body);
+
+            const query = {
+                email: req.body.email,
+                password: req.body.password
+            }
+
+            collection.findOne(query, (err, result) => {
+                if(result!=null){
+                    const objToSend = {
+                        email : result.email,
+                        name : result.name,
+                        password : result.password,
+                        job : result.job
+                    }
+
+                    res.status(200).send(JSON.stringify(objToSend));
+                } else {
+                    result.status(404).send();
+                    console.log("오류");
+                }
+            });
+        })
+
 
 }
 });
