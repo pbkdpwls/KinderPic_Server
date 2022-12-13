@@ -365,6 +365,18 @@ mongoClient.connect(url, (err, db) => {
             });
 
         });
+
+        // 그룹 검색하기
+        app.post('/search_group', (req, res) => {
+            const q_searchid = { group_id: req.body.searchid }
+            collectiong.findOne(q_searchid, (err, result) => {
+                if (result != null) {
+                    res.status(200).send(result.group_name);
+                } else {
+                    res.status(400).send("존재하지 않는 그룹 id입니다.");
+                }
+            });
+        });
 }
 });
 
