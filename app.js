@@ -301,6 +301,32 @@ mongoClient.connect(url, (err, db) => {
             }
             randomString();
        })
+
+        // 새로운 group 추가
+        app.post('/add_group', (req, res) => {
+
+            const newGroup = {
+                group_id: req.body.groupid,
+                group_email: req.body.email,
+                group_name: req.body.groupname,
+                group_date: req.body.groupdate,
+                group_place: req.body.groupplace,
+                group_schoolinfo: req.body.scohoolinfo,
+            };
+
+            const q_email = { email: newGroup.email };
+
+            collectiong.findOne(q_email, (err, result) => {
+                if (result = ! null) {
+                    collectiong.insertOne(newGroup, (err, result) => {
+                        res.status(200).send("새로운 그룹 추가 성공");
+                    });
+                } else {
+                    res.status(400).send("새로운 그룹 추가 실패");
+                    console.log("실패")
+                }
+            });
+        });
 }
 });
 
